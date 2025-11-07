@@ -49,7 +49,42 @@ module "appgw" {
     location                        = var.location
     appgw_name                      = var.appgw_name
     waf_name                        = var.waf_name
-    appgw-subnet_id                 = module.vnet.hub_subnet_ids["AzureApplicationGatewaySubnet"]
+    appgw-subnet_id                 = module.vnet.hub_subnet_ids["ApplicationGatewaySubnet"]
     Front_VM_ipaddress              = module.vm.FrontVM_private_ip_address
     depends_on                      = [module.vm]
+}
+
+module "natgw" {
+    source                          = "./Modules/natgw"
+    Hub_rg_name                     = module.rg.rg["MainRG"].name
+    location                        = var.location
+    natgw_name                      = var.natgw_name
+    Front-subnet_id                 = module.vnet.hub_subnet_ids["FrontSubnet"]
+    Back-subnet_id                  = module.vnet.hub_subnet_ids["BackSubnet"]
+    DB-subnet_id                    = module.vnet.hub_subnet_ids["DBSubnet"]
+    depends_on                      = [module.appgw]
+}
+
+module "backup" {
+    source                          = "./Modules/backup"
+    Hub_rg_name                     = module.rg.rg["MainRG"].name
+    location                        = var.location
+    rv_app_name                     = var.rv_app_name
+    rv_db_name                      = var.rv_db_name
+    frontvm_id                      = module.vm.Front_vm_id
+    backvm-01_id                    = module.vm.back-01_vm_id
+    dbvm-01_id                      = module.vm.db-01_vm_id
+    depends_on                      = [module.appgw]
+}
+
+module "loganalytics" {
+    source                          = "./Modules/la"
+    Hub_rg_name                     = module.rg.rg["MainRG"].name
+    location                        = var.location
+    la_name                         = var.la_name
+    dcr_name                        = var.dcr_name
+    frontvm_id                      = module.vm.Front_vm_id
+    backvm-01_id                    = module.vm.back-01_vm_id
+    dbvm-01_id                      = module.vm.db-01_vm_id
+    depends_on                      = [module.appgw]
 }

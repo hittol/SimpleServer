@@ -6,7 +6,7 @@ location = "koreacentral"
 
 rg_setting = {
   "MainRG" = {
-    name     = "RG-DH-Cloud"
+    name     = "RG-WWD-Cloud"
     location = "koreacentral"
   }
 }
@@ -22,17 +22,21 @@ hub_subnets = {
     "FrontSubnet"                     = {
       address_prefixes                = ["10.0.0.0/24"]
       nsg_key                         = "Front-nsg"
+      default_outbound_access_enabled = true
     },
     "BackSubnet"                      = {
       address_prefixes                = ["10.0.1.0/24"]
       nsg_key                         = "Back-nsg"
+      default_outbound_access_enabled = true
     },
     "DBSubnet"                        = {
       address_prefixes                = ["10.0.2.0/24"]
       nsg_key                         = "DB-nsg"
+      default_outbound_access_enabled = false
     },
-    "AzureApplicationGatewaySubnet"   = {
+    "ApplicationGatewaySubnet"        = {
       address_prefixes                = ["10.0.3.0/24"]
+      default_outbound_access_enabled = true
     }
 }
 
@@ -167,6 +171,25 @@ UbuntuServer =   {
 # AppGW&WAF
 # ===================================================================
 
-appgw_name  = "DH-AppGW"
-waf_name    = "DH-WAF"
+appgw_name  = "WWD-AppGW"
+waf_name    = "WWD-WAF"
 
+# ===================================================================
+# NATGW
+# ===================================================================
+
+natgw_name  = "WWD-NATGW"
+
+# ===================================================================
+# Backup
+# ===================================================================
+
+rv_app_name  = "WWD-RV-AppVM"
+rv_db_name   = "WWD-RV-DBVM"
+
+# ===================================================================
+# log analytics
+# ===================================================================
+
+la_name   = "WWD-VM-LogAnalytics"
+dcr_name  = "WWD-VM-DCR"

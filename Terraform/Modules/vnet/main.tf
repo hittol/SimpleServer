@@ -13,11 +13,12 @@ resource "azurerm_virtual_network" "hub" {
 # ===================================================================
 
 resource "azurerm_subnet" "hub" {
-  for_each             = var.hub_subnets
-  name                 = each.key
-  resource_group_name  = var.Hub_rg_name
-  virtual_network_name = azurerm_virtual_network.hub.name
-  address_prefixes     = each.value.address_prefixes
+  for_each                        = var.hub_subnets
+  name                            = each.key
+  resource_group_name             = var.Hub_rg_name
+  virtual_network_name            = azurerm_virtual_network.hub.name
+  address_prefixes                = each.value.address_prefixes
+  default_outbound_access_enabled = each.value.default_outbound_access_enabled
 }
 
 

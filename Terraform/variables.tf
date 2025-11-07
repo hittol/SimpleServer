@@ -27,8 +27,9 @@ variable "hub_vnet_address_space" {
 
 variable "hub_subnets" {
   type = map(object({
-    address_prefixes = list(string)
-    nsg_key          = optional(string)
+    address_prefixes                = list(string)
+    nsg_key                         = optional(string)
+    default_outbound_access_enabled = optional(bool)
   }))
 }
 
@@ -132,5 +133,37 @@ variable "appgw_name" {
 }
 
 variable "waf_name" {
+  type        = string
+}
+
+# ===================================================================
+# AppGW&WAF
+# ===================================================================
+
+variable "natgw_name" {
+  type        = string
+}
+
+# ===================================================================
+# Backup
+# ===================================================================
+
+variable "rv_app_name" {
+  type        = string
+}
+
+variable "rv_db_name" {
+  type        = string
+}
+
+# ===================================================================
+# Log Analytics
+# ===================================================================
+
+variable "la_name" {
+  type        = string
+}
+
+variable "dcr_name" {
   type        = string
 }

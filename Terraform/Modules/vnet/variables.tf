@@ -20,8 +20,9 @@ variable "hub_vnet_address_space" {
 
 variable "hub_subnets" {
   type = map(object({
-    address_prefixes = list(string)
-    nsg_key          = optional(string)
+    address_prefixes                = list(string)
+    nsg_key                         = optional(string)
+    default_outbound_access_enabled = optional(bool)
   }))
 }
 

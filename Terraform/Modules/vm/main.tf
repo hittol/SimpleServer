@@ -40,9 +40,10 @@ resource "azurerm_public_ip" "Front-pip" {
 # ===================================================================
 
 resource "azurerm_network_interface" "nic_FrontVM"{
-    name                        = "${var.Front_vm_name}-nic"
-    location                    = var.location
-    resource_group_name         = var.rg_name
+    name                            = "${var.Front_vm_name}-nic"
+    location                        = var.location
+    resource_group_name             = var.rg_name
+    accelerated_networking_enabled  = true
 
     ip_configuration {
         name                            = var.ip_config_name
@@ -53,10 +54,11 @@ resource "azurerm_network_interface" "nic_FrontVM"{
     }
 }
 
-resource "azurerm_network_interface" "nic_BackVM"{
-    name                        = "${var.Back_vm_name}-nic"
-    location                    = var.location
-    resource_group_name         = var.rg_name
+resource "azurerm_network_interface" "nic_BackVM-01"{
+    name                            = "${var.Back_vm_name}-nic"
+    location                        = var.location
+    resource_group_name             = var.rg_name
+    accelerated_networking_enabled  = true
 
     ip_configuration {
         name                            = var.ip_config_name
@@ -66,10 +68,11 @@ resource "azurerm_network_interface" "nic_BackVM"{
     }
 }
 
-resource "azurerm_network_interface" "nic_DBVM"{
-    name                        = "${var.DB_vm_name}-nic"
-    location                    = var.location
-    resource_group_name         = var.rg_name
+resource "azurerm_network_interface" "nic_DBVM-01"{
+    name                            = "${var.DB_vm_name}-nic"
+    location                        = var.location
+    resource_group_name             = var.rg_name
+    accelerated_networking_enabled  = true
 
     ip_configuration {
         name                            = var.ip_config_name
@@ -115,11 +118,11 @@ resource "azurerm_linux_virtual_machine" "FrontVM" {
     }
 }
 
-resource "azurerm_linux_virtual_machine" "BackVM" {
+resource "azurerm_linux_virtual_machine" "BackVM-01" {
     name                    = var.Back_vm_name
     location                = var.location
     resource_group_name     = var.rg_name
-    network_interface_ids   = [azurerm_network_interface.nic_BackVM.id]
+    network_interface_ids   = [azurerm_network_interface.nic_BackVM-01.id]
     size                    = var.App_VM_Size
     admin_username          = var.admin_username
 
@@ -143,11 +146,11 @@ resource "azurerm_linux_virtual_machine" "BackVM" {
     }
 }
 
-resource "azurerm_linux_virtual_machine" "DBVM" {
+resource "azurerm_linux_virtual_machine" "DBVM-01" {
     name                    = var.DB_vm_name
     location                = var.location
     resource_group_name     = var.rg_name
-    network_interface_ids   = [azurerm_network_interface.nic_DBVM.id]
+    network_interface_ids   = [azurerm_network_interface.nic_DBVM-01.id]
     size                    = var.DB_VM_Size
     admin_username          = var.admin_username
 
@@ -171,3 +174,42 @@ resource "azurerm_linux_virtual_machine" "DBVM" {
     }
 }
 
+# ===================================================================
+# VM Extenstion (Install AMA)
+# ===================================================================
+
+resource "azurerm_virtual_machine_extension" "FrontVM_extension" {
+  name                       = "AzureMonitorLinuxAgent"
+  virtual_machine_id         = azurerm_linux_virtual_machine.FrontVM.id
+  publisher                  = "Microsoft.Azure.Monitor"
+  type                       = "AzureMonitorLinuxAgent"
+  type_handler_version       = "1.28"
+  auto_upgrade_minor_version = true
+
+  settings                   = jsonencode({})
+  protected_settings         = jsonencode({})
+}
+
+resource "azurerm_virtual_machine_extension" "BackVM-01_extension" {
+  name                       = "AzureMonitorLinuxAgent"
+  virtual_machine_id         = azurerm_linux_virtual_machine.BackVM-01.id
+  publisher                  = "Microsoft.Azure.Monitor"
+  type                       = "AzureMonitorLinuxAgent"
+  type_handler_version       = "1.28"
+  auto_upgrade_minor_version = true
+
+  settings                   = jsonencode({})
+  protected_settings         = jsonencode({})
+}
+
+resource "azurerm_virtual_machine_extension" "DBVM-01_extension" {
+  name                       = "AzureMonitorLinuxAgent"
+  virtual_machine_id         = azurerm_linux_virtual_machine.DBVM-01.id
+  publisher                  = "Microsoft.Azure.Monitor"
+  type                       = "AzureMonitorLinuxAgent"
+  type_handler_version       = "1.28"
+  auto_upgrade_minor_version = true
+
+  settings                   = jsonencode({})
+  protected_settings         = jsonencode({})
+}
