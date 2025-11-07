@@ -6,9 +6,10 @@
 
 ***
 ### 아키텍처
-<img src="./archi.jpg", height="100x", width="100px">
+![architecture](./archi.jpg)
 
 
+<br>
 <br>
 
 ### 변경 현황
