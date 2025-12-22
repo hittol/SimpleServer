@@ -28,15 +28,15 @@ resource "azurerm_backup_policy_vm" "app-backup-policy" {
   recovery_vault_name             = azurerm_recovery_services_vault.rv-app.name
   instant_restore_retention_days  = "5"
 
-  timezone = "UTC"
+  timezone = var.backup_timezone
 
   backup {
-    frequency = "Daily"
-    time      = "23:00"
+    frequency = var.backup_frequency
+    time      = var.backup_time
   }
 
   retention_daily {
-    count = 7
+    count = 14
   }
 }
 
@@ -46,15 +46,15 @@ resource "azurerm_backup_policy_vm" "db-backup-policy" {
   recovery_vault_name             = azurerm_recovery_services_vault.rv-db.name
   instant_restore_retention_days  = "5"
 
-  timezone = "UTC"
+  timezone = var.backup_timezone
 
   backup {
-    frequency = "Daily"
-    time      = "23:00"
+    frequency = var.backup_frequency
+    time      = var.backup_time
   }
 
   retention_daily {
-    count = 7
+    count = 14
   }
 }
 
@@ -65,17 +65,37 @@ resource "azurerm_backup_protected_vm" "front_backup" {
   backup_policy_id    = azurerm_backup_policy_vm.app-backup-policy.id
 }
 
-resource "azurerm_backup_protected_vm" "back01_backup" {
+resource "azurerm_backup_protected_vm" "back_backup" {
   resource_group_name = var.Hub_rg_name
   recovery_vault_name = azurerm_recovery_services_vault.rv-app.name
-  source_vm_id        = var.backvm-01_id
+  source_vm_id        = var.backvm_id
   backup_policy_id    = azurerm_backup_policy_vm.app-backup-policy.id
 }
 
-resource "azurerm_backup_protected_vm" "db_backup" {
+resource "azurerm_backup_protected_vm" "Standby_backup" {
+  resource_group_name = var.Hub_rg_name
+  recovery_vault_name = azurerm_recovery_services_vault.rv-app.name
+  source_vm_id        = var.Standbyvm_id
+  backup_policy_id    = azurerm_backup_policy_vm.app-backup-policy.id
+}
+
+resource "azurerm_backup_protected_vm" "db_01_backup" {
   resource_group_name = var.Hub_rg_name
   recovery_vault_name = azurerm_recovery_services_vault.rv-db.name
   source_vm_id        = var.dbvm-01_id
   backup_policy_id    = azurerm_backup_policy_vm.db-backup-policy.id
 }
 
+resource "azurerm_backup_protected_vm" "db_02_backup" {
+  resource_group_name = var.Hub_rg_name
+  recovery_vault_name = azurerm_recovery_services_vault.rv-db.name
+  source_vm_id        = var.dbvm-02_id
+  backup_policy_id    = azurerm_backup_policy_vm.db-backup-policy.id
+}
+
+resource "azurerm_backup_protected_vm" "db_BU_backup" {
+  resource_group_name = var.Hub_rg_name
+  recovery_vault_name = azurerm_recovery_services_vault.rv-db.name
+  source_vm_id        = var.dbvm-BU_id
+  backup_policy_id    = azurerm_backup_policy_vm.db-backup-policy.id
+}

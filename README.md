@@ -17,6 +17,7 @@
 |------|---|
 |2025.11.06|RG, VNET, VM, APPGW 추가|
 |2025.11.07|NATGW,Recovery Vault,LA&DCR,Network 설정 추가|
+|2025.12.22|LB, NSG, Recovery Vault, VM 설정 추가|
 
 <br>
 
@@ -40,7 +41,7 @@
 ***
 
 ### 사용방법
-* <span style="font-size: 15px">배포 후 VM 접근 시 .Key 의 SSH 인증서 파일 사용.</span>
+* <span style="font-size: 15px">배포 후 VM 접근 시 .Key 폴더에 생성된 SSH 인증서 파일 사용.</span>
 <br>
 
 ***

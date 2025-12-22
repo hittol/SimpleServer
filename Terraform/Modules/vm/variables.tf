@@ -39,15 +39,43 @@ variable "Back_private_ip_address" {
   type        = string
 }
 
+variable "Standby_vm_name" {
+  type        = string
+}
+
+variable "Standby_private_ip_address" {
+  type        = string
+}
+
 variable "Back-subnet_id" {
   type = string   
 }
 
-variable "DB_vm_name" {
+variable "Standby-subnet_id" {
+  type = string
+}
+
+variable "DB_vm_01_name" {
   type        = string
 }
 
-variable "DB_private_ip_address" {
+variable "DB_01_private_ip_address" {
+  type        = string
+}
+
+variable "DB_vm_02_name" {
+  type        = string
+}
+
+variable "DB_02_private_ip_address" {
+  type        = string
+}
+
+variable "DB_vm_BU_name" {
+  type        = string
+}
+
+variable "DB_BU_private_ip_address" {
   type        = string
 }
 
@@ -68,6 +96,14 @@ variable "DB_VM_Size" {
 }
 
 variable "DB_Disk_Size" {
+    type        = string   
+}
+
+variable "DB_BU_VM_Size" {
+    type        = string   
+}
+
+variable "DB_BU_Disk_Size" {
     type        = string   
 }
 

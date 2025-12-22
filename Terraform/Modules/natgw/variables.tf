@@ -18,6 +18,10 @@ variable "Back-subnet_id" {
   type        = string
 }
 
+variable "Standby-subnet_id" {
+  type = string
+}
+
 variable "DB-subnet_id" {
   type        = string
 }

@@ -78,12 +78,36 @@ variable "Back_private_ip_address" {
   type        = string
 }
 
-variable "DB_vm_name" {
-  type        = string
+variable "Standby_vm_name" {
+  type = string
 }
 
-variable "DB_private_ip_address" {
-  type        = string
+variable "Standby_private_ip_address" {
+  type = string
+}
+
+variable "DB_vm_01_name" {
+  type = string
+}
+
+variable "DB_01_private_ip_address" {
+  type = string
+}
+
+variable "DB_vm_02_name" {
+  type = string
+}
+
+variable "DB_02_private_ip_address" {
+  type = string
+}
+
+variable "DB_vm_BU_name" {
+  type = string
+}
+
+variable "DB_BU_private_ip_address" {
+  type = string
 }
 
 variable "App_VM_Size" {
@@ -101,6 +125,15 @@ variable "DB_VM_Size" {
 variable "DB_Disk_Size" {
     type        = string   
 }
+
+variable "DB_BU_VM_Size" {
+  type = string   
+}
+
+variable "DB_BU_Disk_Size" {
+  type = string   
+}
+
 
 variable "storage_account_type" {
     type        = string   
@@ -156,6 +189,18 @@ variable "rv_db_name" {
   type        = string
 }
 
+variable "backup_timezone" {
+  type = string
+}
+
+variable "backup_frequency" {
+  type = string
+}
+
+variable "backup_time" {
+  type = string
+}
+
 # ===================================================================
 # Log Analytics
 # ===================================================================
@@ -166,4 +211,20 @@ variable "la_name" {
 
 variable "dcr_name" {
   type        = string
+}
+
+variable "la_sku" {
+  type = string
+}
+
+# ===================================================================
+# Load Balancer
+# ===================================================================
+
+variable "lb_name" {
+  type = string
+}
+
+variable "lb_private_ip_address" {
+  type = string  
 }

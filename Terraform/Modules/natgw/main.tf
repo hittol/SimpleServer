@@ -39,6 +39,11 @@ resource "azurerm_subnet_nat_gateway_association" "ass-back-subnet" {
   nat_gateway_id = azurerm_nat_gateway.natgw.id
 }
 
+resource "azurerm_subnet_nat_gateway_association" "ass-standby-subnet" {
+  subnet_id      = var.Standby-subnet_id
+  nat_gateway_id = azurerm_nat_gateway.natgw.id
+}
+
 resource "azurerm_subnet_nat_gateway_association" "ass-db-subnet" {
   subnet_id      = var.DB-subnet_id
   nat_gateway_id = azurerm_nat_gateway.natgw.id

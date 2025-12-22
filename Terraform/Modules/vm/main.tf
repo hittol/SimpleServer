@@ -54,7 +54,7 @@ resource "azurerm_network_interface" "nic_FrontVM"{
     }
 }
 
-resource "azurerm_network_interface" "nic_BackVM-01"{
+resource "azurerm_network_interface" "nic_BackVM"{
     name                            = "${var.Back_vm_name}-nic"
     location                        = var.location
     resource_group_name             = var.rg_name
@@ -68,8 +68,22 @@ resource "azurerm_network_interface" "nic_BackVM-01"{
     }
 }
 
+resource "azurerm_network_interface" "nic_StandbyVM"{
+    name                            = "${var.Standby_vm_name}-nic"
+    location                        = var.location
+    resource_group_name             = var.rg_name
+    accelerated_networking_enabled  = true
+
+    ip_configuration {
+        name                            = var.ip_config_name
+        subnet_id                       = var.Standby-subnet_id
+        private_ip_address_allocation   = var.ip_address_allocation
+        private_ip_address              = var.Standby_private_ip_address
+    }
+}
+
 resource "azurerm_network_interface" "nic_DBVM-01"{
-    name                            = "${var.DB_vm_name}-nic"
+    name                            = "${var.DB_vm_01_name}-nic"
     location                        = var.location
     resource_group_name             = var.rg_name
     accelerated_networking_enabled  = true
@@ -78,7 +92,35 @@ resource "azurerm_network_interface" "nic_DBVM-01"{
         name                            = var.ip_config_name
         subnet_id                       = var.DB-subnet_id
         private_ip_address_allocation   = var.ip_address_allocation
-        private_ip_address              = var.DB_private_ip_address
+        private_ip_address              = var.DB_01_private_ip_address
+    }
+}
+
+resource "azurerm_network_interface" "nic_DBVM-02"{
+    name                            = "${var.DB_vm_02_name}-nic"
+    location                        = var.location
+    resource_group_name             = var.rg_name
+    accelerated_networking_enabled  = true
+
+    ip_configuration {
+        name                            = var.ip_config_name
+        subnet_id                       = var.DB-subnet_id
+        private_ip_address_allocation   = var.ip_address_allocation
+        private_ip_address              = var.DB_02_private_ip_address
+    }
+}
+
+resource "azurerm_network_interface" "nic_DBVM-BU"{
+    name                            = "${var.DB_vm_BU_name}-nic"
+    location                        = var.location
+    resource_group_name             = var.rg_name
+    accelerated_networking_enabled  = true
+
+    ip_configuration {
+        name                            = var.ip_config_name
+        subnet_id                       = var.DB-subnet_id
+        private_ip_address_allocation   = var.ip_address_allocation
+        private_ip_address              = var.DB_BU_private_ip_address
     }
 }
 
@@ -118,11 +160,11 @@ resource "azurerm_linux_virtual_machine" "FrontVM" {
     }
 }
 
-resource "azurerm_linux_virtual_machine" "BackVM-01" {
+resource "azurerm_linux_virtual_machine" "BackVM" {
     name                    = var.Back_vm_name
     location                = var.location
     resource_group_name     = var.rg_name
-    network_interface_ids   = [azurerm_network_interface.nic_BackVM-01.id]
+    network_interface_ids   = [azurerm_network_interface.nic_BackVM.id]
     size                    = var.App_VM_Size
     admin_username          = var.admin_username
 
@@ -146,8 +188,36 @@ resource "azurerm_linux_virtual_machine" "BackVM-01" {
     }
 }
 
+resource "azurerm_linux_virtual_machine" "StandbyVM" {
+    name                    = var.Standby_vm_name
+    location                = var.location
+    resource_group_name     = var.rg_name
+    network_interface_ids   = [azurerm_network_interface.nic_StandbyVM.id]
+    size                    = var.App_VM_Size
+    admin_username          = var.admin_username
+
+    os_disk {
+        name                    = "${var.Standby_vm_name}_osdisk"
+        caching                 = var.vm_caching
+        storage_account_type    = var.storage_account_type
+        disk_size_gb            = var.App_Disk_Size
+    }
+
+    source_image_reference {
+        publisher = var.UbuntuServer.publisher
+        offer     = var.UbuntuServer.offer
+        sku       = var.UbuntuServer.sku
+        version   = var.UbuntuServer.version
+    }
+
+    admin_ssh_key {
+    username   = var.admin_username
+    public_key = azurerm_ssh_public_key.vm_ssh_key.public_key
+    }
+}
+
 resource "azurerm_linux_virtual_machine" "DBVM-01" {
-    name                    = var.DB_vm_name
+    name                    = var.DB_vm_01_name
     location                = var.location
     resource_group_name     = var.rg_name
     network_interface_ids   = [azurerm_network_interface.nic_DBVM-01.id]
@@ -155,7 +225,7 @@ resource "azurerm_linux_virtual_machine" "DBVM-01" {
     admin_username          = var.admin_username
 
     os_disk {
-        name                    = "${var.DB_vm_name}_osdisk"
+        name                    = "${var.DB_vm_01_name}_osdisk"
         caching                 = var.vm_caching
         storage_account_type    = var.storage_account_type
         disk_size_gb            = var.DB_Disk_Size
@@ -174,6 +244,61 @@ resource "azurerm_linux_virtual_machine" "DBVM-01" {
     }
 }
 
+resource "azurerm_linux_virtual_machine" "DBVM-02" {
+    name                    = var.DB_vm_02_name
+    location                = var.location
+    resource_group_name     = var.rg_name
+    network_interface_ids   = [azurerm_network_interface.nic_DBVM-02.id]
+    size                    = var.DB_VM_Size
+    admin_username          = var.admin_username
+
+    os_disk {
+        name                    = "${var.DB_vm_02_name}_osdisk"
+        caching                 = var.vm_caching
+        storage_account_type    = var.storage_account_type
+        disk_size_gb            = var.DB_Disk_Size
+    }
+
+    source_image_reference {
+        publisher = var.UbuntuServer.publisher
+        offer     = var.UbuntuServer.offer
+        sku       = var.UbuntuServer.sku
+        version   = var.UbuntuServer.version
+    }
+
+    admin_ssh_key {
+    username   = var.admin_username
+    public_key = azurerm_ssh_public_key.vm_ssh_key.public_key
+    }
+}
+
+resource "azurerm_linux_virtual_machine" "DBVM-BU" {
+    name                    = var.DB_vm_BU_name
+    location                = var.location
+    resource_group_name     = var.rg_name
+    network_interface_ids   = [azurerm_network_interface.nic_DBVM-BU.id]
+    size                    = var.DB_BU_VM_Size
+    admin_username          = var.admin_username
+
+    os_disk {
+        name                    = "${var.DB_vm_BU_name}_osdisk"
+        caching                 = var.vm_caching
+        storage_account_type    = var.storage_account_type
+        disk_size_gb            = var.DB_BU_Disk_Size
+    }
+
+    source_image_reference {
+        publisher = var.UbuntuServer.publisher
+        offer     = var.UbuntuServer.offer
+        sku       = var.UbuntuServer.sku
+        version   = var.UbuntuServer.version
+    }
+
+    admin_ssh_key {
+    username   = var.admin_username
+    public_key = azurerm_ssh_public_key.vm_ssh_key.public_key
+    }
+}
 # ===================================================================
 # VM Extenstion (Install AMA)
 # ===================================================================
@@ -190,9 +315,21 @@ resource "azurerm_virtual_machine_extension" "FrontVM_extension" {
   protected_settings         = jsonencode({})
 }
 
-resource "azurerm_virtual_machine_extension" "BackVM-01_extension" {
+resource "azurerm_virtual_machine_extension" "BackVM_extension" {
   name                       = "AzureMonitorLinuxAgent"
-  virtual_machine_id         = azurerm_linux_virtual_machine.BackVM-01.id
+  virtual_machine_id         = azurerm_linux_virtual_machine.BackVM.id
+  publisher                  = "Microsoft.Azure.Monitor"
+  type                       = "AzureMonitorLinuxAgent"
+  type_handler_version       = "1.28"
+  auto_upgrade_minor_version = true
+
+  settings                   = jsonencode({})
+  protected_settings         = jsonencode({})
+}
+
+resource "azurerm_virtual_machine_extension" "StandbyVM_extension" {
+  name                       = "AzureMonitorLinuxAgent"
+  virtual_machine_id         = azurerm_linux_virtual_machine.StandbyVM.id
   publisher                  = "Microsoft.Azure.Monitor"
   type                       = "AzureMonitorLinuxAgent"
   type_handler_version       = "1.28"
@@ -205,6 +342,30 @@ resource "azurerm_virtual_machine_extension" "BackVM-01_extension" {
 resource "azurerm_virtual_machine_extension" "DBVM-01_extension" {
   name                       = "AzureMonitorLinuxAgent"
   virtual_machine_id         = azurerm_linux_virtual_machine.DBVM-01.id
+  publisher                  = "Microsoft.Azure.Monitor"
+  type                       = "AzureMonitorLinuxAgent"
+  type_handler_version       = "1.28"
+  auto_upgrade_minor_version = true
+
+  settings                   = jsonencode({})
+  protected_settings         = jsonencode({})
+}
+
+resource "azurerm_virtual_machine_extension" "DBVM-02_extension" {
+  name                       = "AzureMonitorLinuxAgent"
+  virtual_machine_id         = azurerm_linux_virtual_machine.DBVM-02.id
+  publisher                  = "Microsoft.Azure.Monitor"
+  type                       = "AzureMonitorLinuxAgent"
+  type_handler_version       = "1.28"
+  auto_upgrade_minor_version = true
+
+  settings                   = jsonencode({})
+  protected_settings         = jsonencode({})
+}
+
+resource "azurerm_virtual_machine_extension" "DBVM-BU_extension" {
+  name                       = "AzureMonitorLinuxAgent"
+  virtual_machine_id         = azurerm_linux_virtual_machine.DBVM-BU.id
   publisher                  = "Microsoft.Azure.Monitor"
   type                       = "AzureMonitorLinuxAgent"
   type_handler_version       = "1.28"
