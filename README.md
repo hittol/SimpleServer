@@ -1,6 +1,6 @@
 **Simple WEB&WAS Service Platform by Terraform**
 ===========================
-<span style="font-size: 12px">ver 2025.11.07</span>
+<span style="font-size: 12px">ver 2025.12.22</span>
 <br>
 
 
